@@ -49,15 +49,16 @@ class JC_model:
 
 
     def field_mode_operators(self):
-        """ Returns field mode creation (a†) and annihilation (a) operators. """
-        arr = tf.math.sqrt(tf.range(
-            0., self.env_dim, dtype=tf.float64))
-        matr = tf.reshape(tf.concat(
-            [arr for i in range(self.env_dim)], 0), [self.env_dim, self.env_dim])
-        annih_oper = tf.cast(tf.linalg.band_part(
-            matr, 0, 1) - tf.linalg.band_part(
-            matr, 0, 0), dtype=tf.complex128)
-        return annih_oper, tf.linalg.adjoint(annih_oper)
+        """ Return creation (a†)  & annihilation (a) operators of field mode """
+        vals = tf.math.sqrt(tf.range(1., self.env_dim, dtype=tf.float64))
+        inds = np.array([np.arange(self.env_dim - 1), np.arange(self.env_dim - 1) + 1]).T
+        annihilation = tf.sparse.SparseTensor(indices=inds, values=vals,
+                                              dense_shape=[self.env_dim, self.env_dim])
+        annihilation = tf.sparse.to_dense(annihilation)
+        annihilation = tf.cast(annihilation, dtype=tf.complex128)
+        creation = tf.linalg.adjoint(annihilation)
+        return annihilation, creation
+
 
 
     def env_init(self):
