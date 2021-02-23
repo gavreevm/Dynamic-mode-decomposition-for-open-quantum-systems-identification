@@ -124,9 +124,9 @@ class JC_model:
         # Interaction Hamiltonian
         h_int = omega * tf.reshape(
             tf.einsum('ij,kl->ikjl', 1/2 * (
-            self.pauli[0] - 1j * self.pauli[1]), annihilation) +\
+            self.pauli[0] + 1j * self.pauli[1]), annihilation) +\
             tf.einsum('ij,kl->ikjl', 1/2 * (
-            self.pauli[0] + 1j * self.pauli[1]), creation), (dim, dim))
+            self.pauli[0] - 1j * self.pauli[1]), creation), (dim, dim))
 
         jc_ham = h_sys + h_field + h_int
 
