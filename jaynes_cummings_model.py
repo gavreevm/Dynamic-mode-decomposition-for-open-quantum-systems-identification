@@ -133,34 +133,27 @@ class JC_model:
         # Commutator vectorization
         ham_id = tf.einsum('ij,kl->ikjl', jc_ham, identity)
         id_ham = tf.einsum('ij,lk->ikjl', identity, jc_ham)
-        commutator = tf.reshape(
-            1j * (id_ham - ham_id), (dim ** 2, dim ** 2))
+        commutator = tf.reshape(1j * (id_ham - ham_id), (dim ** 2, dim ** 2))
 
         # Jump operators in vectorized form
-        annihilation_jump = tf.reshape(tf.einsum(
-            'ij,kl->ikjl', id_sys, annihilation), (dim, dim))
-        creation_jump = tf.reshape(tf.einsum(
-            'ij,kl->ikjl', id_sys, creation), (dim, dim))
+        annihilation_jump = tf.reshape(tf.einsum('ij,kl->ikjl', id_sys, annihilation), (dim, dim))
+        creation_jump = tf.reshape(tf.einsum('ij,kl->ikjl', id_sys, creation), (dim, dim))
 
-        # Dissipator in vectorized form 
+        # Dissipator in vectorized form
         dissipator = gamma * (
             tf.reshape(tf.einsum('ij,kl->ikjl', tf.transpose(
-                creation_jump), annihilation_jump), (
-                    dim ** 2, dim ** 2)) -\
-            1/2 * tf.reshape(tf.einsum(
-                'ij,kl->ikjl', identity, creation_jump @ annihilation_jump), (
-                    dim ** 2, dim ** 2)) -\
-            1/2 * tf.reshape(tf.einsum(
-                'ij,kl->ikjl', tf.transpose(
-                    creation_jump @ annihilation_jump), identity), (
-                        dim ** 2, dim ** 2))
-        )
+                creation_jump), annihilation_jump), (dim ** 2, dim ** 2)) -\
+            1/2 * tf.reshape(tf.einsum('ij,kl->ikjl', identity,
+            creation_jump @ annihilation_jump), (dim ** 2, dim ** 2)) -\
+            1/2 * tf.reshape(tf.einsum('ij,kl->ikjl',
+            tf.transpose(creation_jump @ annihilation_jump), identity), (dim ** 2, dim ** 2))
         self.generator = commutator + dissipator
 
 
     def sample_spherical(self, npoints, ndim=3):
         """ Generates "npoints" uniformly distributed random points in
             "ndim"-dimensioanl sphere """
+
         vec = np.random.randn(ndim, npoints)
         vec /= np.linalg.norm(vec, axis=0)
         return vec
@@ -176,6 +169,7 @@ class JC_model:
             - rho_0, initial state of the system,
                      if not given the system will
                      be initialized randomly """
+
         dim = self.sys_dim * self.env_dim
         if rho_0 == None:
             lines = []
@@ -209,4 +203,3 @@ class JC_model:
                 line.append(tf.einsum('ikjk->ij', tf.reshape(
                     state, (self.sys_dim, self.env_dim, self.sys_dim, self.env_dim))))
             self.dynamics = tf.convert_to_tensor(line)
-
