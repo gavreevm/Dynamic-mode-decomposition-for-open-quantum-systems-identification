@@ -2,6 +2,7 @@ import tensorflow as tf
 import numpy as np
 from tqdm import tqdm
 
+
 class JC_model:
     """ Class provides the tool for Jaynes-Cummings model simulation.
     Args:
@@ -146,7 +147,7 @@ class JC_model:
             1/2 * tf.reshape(tf.einsum('ij,kl->ikjl', identity,
             creation_jump @ annihilation_jump), (dim ** 2, dim ** 2)) -\
             1/2 * tf.reshape(tf.einsum('ij,kl->ikjl',
-            tf.transpose(creation_jump @ annihilation_jump), identity), (dim ** 2, dim ** 2))
+            tf.transpose(creation_jump @ annihilation_jump), identity), (dim ** 2, dim ** 2)))
         self.generator = commutator + dissipator
 
 
